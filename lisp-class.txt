@@ -1,0 +1,19 @@
+https :  //common-lisp.net/project/clo/sp/index.html
+
+(defun foo (n)
+ (print n)
+ (cond ((<= n 1) t)
+       ((evenp n) (foo (/ n 2)))
+       (t (foo (+ (* n 3) 1)))))
+
+
+(defun show-lists (ls)
+  (format t "~A" (showdots-rec ls)))
+
+(defun showdots-rec (lst)
+  (if lst
+      (if (atom lst)
+	  lst
+	(dolist (obj lst)
+	(format nil "[~A ]" (if (listp(lst)) (lst) (showdots-rec (lst))) )))))
+

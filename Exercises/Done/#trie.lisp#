@@ -1,0 +1,62 @@
+(in-package :cs325-user)
+
+
+(defpackage trie
+  (:export make-trie add-word subtrie trie-word trie-count mapc-trie read-words)
+  (:use :common-lisp))
+
+(in-package trie)
+
+(defclass trie ()
+  ((word   :accessor trie-word
+           :initform nil)
+   (count  :accessor trie-count
+           :initform 0)
+   (branch :accessor trie-branch
+           :initform nil)))
+
+(defun make-trie ()
+  (make-instance 'trie))
+
+(defun get-subtrie (trie leaf)
+  (cdr (assoc leaf (trie-branch trie))))
+
+(defun trie-traverse (trie chars)
+  (cond ((null trie) nil)
+        ((null (car chars)) trie)
+        (t 
+         (trie-traverse (get-subtrie trie (car chars)) (cdr chars)))))
+
+(defun subtrie (trie &rest chars)
+  (trie-traverse trie chars))
+
+(defun add-chars (trie word chars)
+  (cond ((null chars) 
+         (setf (trie-word trie) word) 
+         (incf (trie-count trie)))
+        (t
+         (let ((subtrie (get-subtrie trie (car chars))))
+           (incf (trie-count trie))
+           (when (null subtrie)
+             (setf subtrie (make-trie))
+             (push (cons (car chars) subtrie) (trie-branch trie)))
+           (add-chars subtrie word (cdr chars))))))
+
+(defun add-word (word trie)
+  (let ((chars (coerce word 'list)))
+    (add-chars trie word chars)
+    trie))
+
+(defun mapc-trie (fn trie)
+  (loop for (char . subtrie) in (trie-branch trie)
+        do (funcall fn char subtrie)))
+
+(defun read-words (file trie)
+  (with-open-file (stream file)
+    (do ((word (read-line stream nil) (read-line stream nil)))
+        ((null word) trie)
+      (add-word word trie))))
+
+
+
+

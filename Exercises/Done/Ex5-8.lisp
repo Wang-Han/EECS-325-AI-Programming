@@ -1,0 +1,17 @@
+(in-package :cs325-user)
+
+
+#|
+(defun max-min (vec &key (start 0) (end (length vec)) mx mn)
+  (if (= start end) (values mx mn)
+    (let* ((mx (max (svref vec start) (or mx (svref vec start))))
+           (mn (min (svref vec start) (or mn (svref vec start)))))
+      (max-min vec :start (1+ start) :end end :mx mx :mn mn))))
+|#
+
+
+(defun max-min (vec &key (start 0) (end (length vec)) mx mn)
+  (if (= start end) 
+      (values mx mn)
+    (let ((tmp (svref vec start)))
+      (max-min vec :start (1+ start) :end end :mx (max tmp (or mx tmp)) :mn (min tmp (or mn tmp))))))
